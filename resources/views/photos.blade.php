@@ -12,5 +12,17 @@
     </head>
     <body>
         <h2>Photos</h2>
+        <form action="/image" method="POST" enctype="multipart/form-data">
+            @csrf
+            Select image to upload:
+            <input type="file" name="photo">
+            <input type="submit" value="Upload Image">
+        </form>
+
+        @if ($errors->has('photo'))
+            <p style="color: red">
+                {{ $errors->first('photo') }}
+            </p>
+        @endif
     </body>
 </html>
