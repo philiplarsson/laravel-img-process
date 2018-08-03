@@ -11,4 +11,15 @@ class ImageController extends Controller
     {
         return view('photos');
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|file|max:19000'
+        ]);
+
+        $file = $request->file('photo');
+
+        dd($file->getSize());
+    }
 }
