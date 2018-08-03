@@ -28,6 +28,17 @@ if [ $# -gt 0 ]; then
             app \
             ./vendor/bin/phpunit "$@"
 
+    elif [ "$1" == "bash" ]; then
+        if [ -n "$2" ]; then
+            docker exec \
+                -it \
+                "$2" \
+                bash
+        else
+            echo 'Specify container name or id as second argument'
+            exit
+        fi
+
     else
         docker-compose "$@"
     fi
