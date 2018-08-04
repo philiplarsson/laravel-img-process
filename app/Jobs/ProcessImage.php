@@ -64,15 +64,19 @@ class ProcessImage implements ShouldQueue
             $constraint->upsize();
         });
 
-        // TODO: possible improvement, if original image already is smaller than 640, create a symlink
-        // instead of creating a thumbnailImage that is at same size as largeImage.
-        $thumbnailImage = Image::make($rawFile)->resize(640, null, function ($constraint) {
-            $constraint->aspectRatio();
-            $constraint->upsize();
-        });
-
         $largeImage->save($this->largeImagePath);
-        $thumbnailImage->save($this->smallImagePath);
+
+        if ($largeImage->width() <= 640) {
+            // No need to create a thumbnail if image already is small.
+            // Create symlink instead
+            symlink($this->largeImagePath, $this->smallImagePath);
+        } else {
+            $thumbnailImage = Image::make($rawFile)->resize(640, null, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+            $thumbnailImage->save($this->smallImagePath);
+        }
 
         Storage::delete($this->unprocessedImagePath);
 
