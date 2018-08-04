@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Jobs\ProcessImage;
 
 class ImageController extends Controller
 {
-
     public function index()
     {
         return view('photos');
@@ -20,6 +20,9 @@ class ImageController extends Controller
 
         $file = $request->file('photo');
 
-        dd($file->getSize());
+        $filePath = $file->store('unprocessed_images');
+        ProcessImage::dispatch($filePath);
+
+        return view('welcome');
     }
 }
