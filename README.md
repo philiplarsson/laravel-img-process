@@ -16,3 +16,10 @@ php artisan migrate
 QUEUE_DRIVER=database
 ```
 
+- As for now, processed images are stored in `storage/app/public`. A symlink
+  should be created from `public/storage`, and can be made with 
+
+``` {.bash}
+php artisan storage:link
+```
+  
