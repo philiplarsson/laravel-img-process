@@ -37,10 +37,12 @@ class ProcessImage implements ShouldQueue
         $this->image = $image;
         $this->unprocessedFilePath = $image->unprocessed_path;
 
+        $this->image->thumbnail_filename = $this->getThumbnailFilename($this->image->filename);
+        $this->image->save();
         $this->processedFilePath = storage_path() . self::PROCESSED_IMAGE_FOLDER;
 
         $this->largeImagePath = $this->processedFilePath . '/' . $this->image->filename;
-        $this->smallImagePath = $this->processedFilePath . '/' . $this->getThumbnailFilename($this->image->filename);
+        $this->smallImagePath = $this->processedFilePath . '/' . $this->image->thumbnail_filename;
     }
 
     /**

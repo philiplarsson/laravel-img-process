@@ -6,6 +6,7 @@
 
 ``` {.bash}
 php artisan queue:table
+php artisan queue:failed-table
 
 php artisan migrate
 ```

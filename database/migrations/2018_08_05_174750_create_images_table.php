@@ -25,6 +25,7 @@ class CreateImagesTable extends Migration
             $table->string('path', 255)->nullable(true);
             $table->string('thumbnail_path', 255)->nullable(true);
             $table->string('filename', 255)->nullable(true);
+            $table->string('thumbnail_filename', 255)->nullable(true);
         });
     }
 

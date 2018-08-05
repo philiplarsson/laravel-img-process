@@ -30,6 +30,6 @@ class ImageController extends Controller
 
         ProcessImage::dispatch($image);
 
-        return view('welcome');
+        return redirect()->route('home');
     }
 }
