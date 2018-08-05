@@ -21,18 +21,12 @@ RUN apk --update add wget \
   libgsasl-dev \
   supervisor
 
-RUN docker-php-ext-install mysqli mbstring pdo pdo_mysql tokenizer xml pcntl
+RUN docker-php-ext-install mysqli mbstring pdo pdo_mysql tokenizer xml pcntl bcmath
 RUN pecl channel-update pecl.php.net && pecl install memcached mcrypt-1.0.1 && docker-php-ext-enable memcached
 
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) \
     && docker-php-ext-install -j${NPROC} gd
-
-#Install BCMath package:
-ARG INSTALL_BCMATH=false
-RUN if [ ${INSTALL_BCMATH} = true ]; then \
-    docker-php-ext-install bcmath \
-;fi
 
 COPY .docker/worker/supervisord.conf /etc/supervisord.conf
 
