@@ -9,87 +9,67 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-
-        <!-- Styles -->
         <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-                height: 100vh;
-                margin: 0;
-            }
 
-            .full-height {
-                height: 100vh;
-            }
-
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
+            .button {
+                padding: 5px;
+                background-color: aliceblue;
+                width: 150px;
                 text-align: center;
+                margin: 10px;
+                border-radius: 10px;
             }
 
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: .1rem;
+            .button a {
                 text-decoration: none;
-                text-transform: uppercase;
             }
 
-            .m-b-md {
-                margin-bottom: 30px;
+            .flex-container {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            /* Thumbnail center and crop from https://jonathannicol.com/blog/2014/06/16/centre-crop-thumbnails-with-css/ */
+            .thumbnail {
+                position: relative;
+                width: 200px;
+                height: 200px;
+                overflow: hidden;
+                margin: 10px;
+            }
+
+            .thumbnail img {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                height: 100%;
+                width: auto;
+                -webkit-transform: translate(-50%,-50%);
+                    -ms-transform: translate(-50%,-50%);
+                        transform: translate(-50%,-50%);
             }
         </style>
     </head>
     <body>
-        <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
-                        <a href="{{ route('register') }}">Register</a>
-                    @endauth
-                </div>
-            @endif
+    <h2>Welcome!</h2>
 
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
+    <h4>Images</h4>
+    <div class="button">
+        <a href="/images">Add new image</a>
+    </div>
 
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
-                </div>
+    <div class="flex-container">
+        @forelse ($images as $image)
+            <div class="thumbnail">
+                <a href="/storage/processed_images/{{ $image->filename }}">
+                    <img src="/storage/processed_images/{{ $image->thumbnail_filename }}" alt="">
+                </a>
             </div>
-        </div>
+        @empty
+            <p>No images...</p>
+        @endforelse
+    </div>
+
+
     </body>
 </html>
