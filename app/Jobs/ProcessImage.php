@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Image;
 use Illuminate\Bus\Queueable;
 use Illuminate\Http\File;
 use Illuminate\Queue\SerializesModels;
@@ -10,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Facades\Image as ImageTransformer;
 
 class ProcessImage implements ShouldQueue
 {
@@ -20,9 +21,9 @@ class ProcessImage implements ShouldQueue
 
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private $image;
     private $processedFilePath;
     private $unprocessedFilePath;
-    private $fileName;
     private $largeImagePath;
     private $smallImagePath;
 
@@ -31,15 +32,15 @@ class ProcessImage implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $filePath)
+    public function __construct(Image $image)
     {
-        $this->unprocessedFilePath = $filePath;
-        $this->fileName = basename($filePath);
+        $this->image = $image;
+        $this->unprocessedFilePath = $image->unprocessed_path;
 
         $this->processedFilePath = storage_path() . self::PROCESSED_IMAGE_FOLDER;
 
-        $this->largeImagePath = $this->processedFilePath . '/' . $this->fileName;
-        $this->smallImagePath = $this->processedFilePath . '/' . $this->getThumbnailFilename($this->fileName);
+        $this->largeImagePath = $this->processedFilePath . '/' . $this->image->filename;
+        $this->smallImagePath = $this->processedFilePath . '/' . $this->getThumbnailFilename($this->image->filename);
     }
 
     /**
@@ -68,12 +69,21 @@ class ProcessImage implements ShouldQueue
 
         $largeImage = $this->createResizedImage($rawFile, self::LARGE_IMG_WIDTH);
 
+        $this->image->width = $largeImage->width();
+        $this->image->height = $largeImage->height();
+
         if ($largeImage->width() <= self::THUMBNAIL_WIDTH) {
             // No need to create a thumbnail if image already is small.
             // Create symlink instead
             symlink($this->largeImagePath, $this->smallImagePath);
+            $this->image->thumbnail_width = $largeImage->width();
+            $this->image->thumbnail_height = $largeImage->height();
         } else {
             $thumbnailImage = $this->createResizedImage($rawFile, self::THUMBNAIL_WIDTH);
+
+            $this->image->thumbnail_width = $thumbnailImage->width();
+            $this->image->thumbnail_height = $thumbnailImage->height();
+
             $thumbnailImage->save($this->smallImagePath);
             $thumbnailImage->destroy();
         }
@@ -83,7 +93,12 @@ class ProcessImage implements ShouldQueue
 
         Storage::delete($this->unprocessedFilePath);
 
-        \Log::info("Done with processing image '{$this->fileName}'. ");
+        $this->image->path = $this->largeImagePath;
+        $this->image->thumbnail_path = $this->smallImagePath;
+        $this->image->processed = true;
+        $this->image->save();
+
+        \Log::info("Done with processing image '{$this->image->filename}'. ");
     }
 
     /**
@@ -107,7 +122,7 @@ class ProcessImage implements ShouldQueue
      */
     private function createResizedImage($rawFile, int $width = self::LARGE_IMG_WIDTH)
     {
-        $largeImage = Image::make($rawFile)->resize($width, null, function ($constraint) {
+        $largeImage = ImageTransformer::make($rawFile)->resize($width, null, function ($constraint) {
             $constraint->aspectRatio();
             $constraint->upsize();
         });

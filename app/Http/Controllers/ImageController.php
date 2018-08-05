@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Image;
 use Illuminate\Http\Request;
 use App\Jobs\ProcessImage;
 
@@ -21,7 +22,13 @@ class ImageController extends Controller
         $file = $request->file('photo');
 
         $filePath = $file->store('unprocessed_images');
-        ProcessImage::dispatch($filePath);
+
+        $image = new Image;
+        $image->unprocessed_path = $filePath;
+        $image->filename = basename($filePath);
+        $image->save();
+
+        ProcessImage::dispatch($image);
 
         return view('welcome');
     }
