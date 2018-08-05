@@ -1,5 +1,8 @@
 <?php
 
+use App\Image;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,8 +15,12 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    $images = Image::where('processed', true)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('welcome', ['images' => $images]);
+})->name('home');
 
 Route::get('/images', 'ImageController@index');
 
