@@ -14,15 +14,21 @@
         <h2>Photos</h2>
         <form action="/image" method="POST" enctype="multipart/form-data">
             @csrf
-            Select image to upload:
-            <input type="file" name="photo">
+            Select images (one or multiple) to upload:
+            <input type="file" name="photos[]" multiple>
             <input type="submit" value="Upload Image">
         </form>
 
-        @if ($errors->has('photo'))
-            <p style="color: red">
-                {{ $errors->first('photo') }}
-            </p>
+        @if ($errors->any())
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>
+                    <p style="color: red">
+                        {{ $error }}
+                    </p>
+                </li>
+                @endforeach
+            </ul>
         @endif
     </body>
 </html>

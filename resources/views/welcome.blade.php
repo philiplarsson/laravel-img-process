@@ -53,6 +53,12 @@
     <body>
     <h2>Welcome!</h2>
 
+    @if (session('status'))
+            <i>
+                {{ session('status') }}
+            </i>
+    @endif
+
     <h4>Images</h4>
     <div class="button">
         <a href="/images">Add new image</a>

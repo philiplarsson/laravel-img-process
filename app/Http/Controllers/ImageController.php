@@ -16,20 +16,25 @@ class ImageController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'photo' => 'required|image|file|max:19000'
+            'photos' => 'required|array',
+            'photos.*' => 'required|image|file|max:19000'
         ]);
 
-        $file = $request->file('photo');
+        $files = $request->file('photos');
 
-        $filePath = $file->store('unprocessed_images');
+        foreach ($files as $file) {
+            $filePath = $file->store('unprocessed_images');
 
-        $image = new Image;
-        $image->unprocessed_path = $filePath;
-        $image->filename = basename($filePath);
-        $image->save();
+            $image = new Image;
+            $image->unprocessed_path = $filePath;
+            $image->filename = basename($filePath);
+            $image->save();
 
-        ProcessImage::dispatch($image);
+            ProcessImage::dispatch($image);
+        }
 
-        return redirect()->route('home');
+        return redirect()
+            ->route('home')
+            ->with('status', 'Image is being processed, but manual refresh when done is needed. ');
     }
 }
