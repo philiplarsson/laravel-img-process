@@ -9,26 +9,24 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="/css/dropzone.css">
+
+        <!-- JS -->
+        <script src="/js/dropzone.js"></script>
     </head>
     <body>
-        <h2>Photos</h2>
-        <form action="/image" method="POST" enctype="multipart/form-data">
-            @csrf
-            Select images (one or multiple) to upload:
-            <input type="file" name="photos[]" multiple>
-            <input type="submit" value="Upload Image">
+        <h2>Image Upload</h2>
+        <ul>
+            <li><a href="/">Back to homepage</a></li>
+        </ul>
+        <h3>Image Dropzone</h3>
+        <form action="/image"
+              class="dropzone"
+              id="my-awesome-dropzone">
+        @csrf
         </form>
 
-        @if ($errors->any())
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>
-                    <p style="color: red">
-                        {{ $error }}
-                    </p>
-                </li>
-                @endforeach
-            </ul>
-        @endif
     </body>
 </html>

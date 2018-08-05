@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Image;
 use Illuminate\Http\Request;
 use App\Jobs\ProcessImage;
+use Validator;
 
 class ImageController extends Controller
 {
@@ -15,26 +16,32 @@ class ImageController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'photos' => 'required|array',
-            'photos.*' => 'required|image|file|max:19000'
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|image|file|max:19000'
         ]);
 
-        $files = $request->file('photos');
-
-        foreach ($files as $file) {
-            $filePath = $file->store('unprocessed_images');
-
-            $image = new Image;
-            $image->unprocessed_path = $filePath;
-            $image->filename = basename($filePath);
-            $image->save();
-
-            ProcessImage::dispatch($image);
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'error' => $validator->errors()->first('file')
+                ], 422);
+            } else {
+                return redirect('/images')
+                    ->withErrors($validator);
+            }
         }
 
-        return redirect()
-            ->route('home')
-            ->with('status', 'Image is being processed, but manual refresh when done is needed. ');
+        $file = $request->file('file');
+
+        $filePath = $file->store('unprocessed_images');
+
+        $image = new Image;
+        $image->unprocessed_path = $filePath;
+        $image->filename = basename($filePath);
+        $image->save();
+
+        ProcessImage::dispatch($image);
+
+        return;
     }
 }
