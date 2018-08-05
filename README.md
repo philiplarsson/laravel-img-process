@@ -1,5 +1,13 @@
 # Img Tester
 
+Test project for image upload with job that resize images.
+
+Run with 
+
+``` {.bash}
+docker-compose up -d --build
+```
+
 ## Setup
 
 - Create jobs table and run migration
