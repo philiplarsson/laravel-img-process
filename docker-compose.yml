@@ -11,6 +11,15 @@ services:
     networks:
       - appnet
     working_dir: /srv/app
+  worker:
+    build:
+      context: .
+      dockerfile: .docker/worker/Dockerfile
+    volumes:
+      - .:/srv/app
+    networks:
+      - appnet
+    working_dir: /srv/app
   mariadb:
     image: mariadb:10.3
     ports:
